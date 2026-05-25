@@ -129,9 +129,9 @@ group_routes = ["123456789:model-c"]
 
 加载后会归一化为新的 `[[routes]]` 格式。
 
-## 当前 MaiBot 本体 Hook 限制
+## 当前 MaiBot 本体 Hook 兼容说明
 
-插件已经返回兼容字段：
+插件会返回以下兼容字段：
 
 - `model_name`
 - `requested_model_name`
@@ -143,5 +143,28 @@ group_routes = ["123456789:model-c"]
 当前 MaiBot 本体中：
 
 1. `maisaka.replyer.before_request` 已原生消费 `model_name`，Replyer 可以切换到路由模型列表中的第一个模型。
-2. `maisaka.planner.before_request` 当前主要消费 `messages` 和 `tool_definitions`，如果本体未消费 `model_name` / `model_list`，Planner 路由字段会被安全忽略。
-3. 当前显式指定单个 `model_name` 时通常只尝试该模型，不会自动继续尝试插件列表中的后续模型。
+2. `maisaka.planner.before_request` 当前主要消费 `messages` 和 `tool_definitions`，部分版本不会直接消费 `model_name` / `model_list`。
+3. 为了在不修改 MaiBot 本体的前提下让 Planner 也能稳定路由，插件在加载时会安装运行时兼容层，在 LLMService / ChatLoop / LLMOrchestrator 调用链上补充模型选择逻辑。
+4. 当前显式指定单个 `model_name` 时通常只尝试该模型，不会自动继续尝试插件列表中的后续模型。
+
+因此，命中路由后：
+
+- Replyer 优先通过原生 Hook 字段生效。
+- Planner 会通过插件的运行时兼容层在最终模型请求前强制使用路由模型。
+- 模型的 API Provider、base_url、API Key、temperature、max_tokens 等参数仍然完全来自 MaiBot 的 `model_config`。
+
+## 与原插件的关系
+
+本插件的功能方向受到 A_Dawn 开发的早期 MaiBot 模型路由插件启发，在此表示感谢。
+
+A_Dawn 的插件为 MaiBot 早期版本提供了按会话切换模型的思路，但由于 MaiBot 当前版本的插件系统、Hook 机制以及 Planner / Replyer 调用链已经发生变化，旧插件已无法直接适配当前版本，且目前不再维护。
+
+因此，本插件是在当前 MaiBot 版本基础上重新开发的独立实现，目标是在不修改 MaiBot 本体的前提下，实现按 QQ 群号或私聊 QQ 号为 Planner / Replyer 指定模型。插件只负责模型名称路由，不额外保存 API Key、base_url、temperature 等模型参数，这些配置仍由 MaiBot 的 `model_config` 统一管理。
+
+本插件不是原插件的官方续作，也不是对原插件的直接复制或维护分支。如 A_Dawn 后续恢复维护或发布新版模型路由插件，用户可以根据自身需求自行选择使用。
+
+## 致谢
+
+感谢 A_Dawn 对 MaiBot 模型路由能力的早期探索与贡献。这个插件的开发思路受到了其早期工作的启发。
+
+如果本项目中存在表述不当、遗漏致谢或其他不合适的地方，欢迎通过 issue 或 pull request 提出修正。
