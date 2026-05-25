@@ -1,0 +1,69 @@
+# MaiBot 模型路由插件配置
+#
+# 插件只负责“按会话选择模型名称”，不会在插件里配置 API Key、base_url、
+# temperature、max_tokens、供应商等模型参数。
+# 所有模型名称都必须已经在 MaiBot 的 model_config.toml 中配置好。
+#
+# 每个 [[routes]] 就是一条完整路由，Planner 和 Replyer 放在同一条规则里。
+# 在 WebUI 中也是同一条路由卡片内分别填写 Planner 模型和 Replyer 模型。
+#
+# target_type:
+#   "group"   = QQ群聊，target_id 填QQ群号
+#   "private" = QQ私聊，target_id 填对方QQ号
+#
+# planner_models / replyer_models:
+#   直接填写 model_config 中已有的模型名称。
+#   可以写一个，也可以写多个。
+#   如果某个阶段不需要路由，就填 []。
+
+[plugin]
+# 是否启用插件。
+enabled = false
+
+# 配置版本号，请不要随意修改。
+config_version = "1.0.0"
+
+
+[logging]
+# 是否输出中文日志。
+enabled = true
+
+
+[[routes]]
+# 是否启用这一条路由。
+enabled = true
+
+# 路由名称，只用于日志显示。
+name = "示例群聊路由"
+
+# 会话类型：group 表示QQ群聊。
+target_type = "group"
+
+# QQ群号。
+target_id = "123456789"
+
+# Planner 使用的模型名称列表，直接写 model_config 中已有模型名。
+planner_models = ["模型2", "模型3"]
+
+# Replyer 使用的模型名称列表，直接写 model_config 中已有模型名。
+replyer_models = ["模型2", "模型3"]
+
+
+[[routes]]
+# 是否启用这一条路由。
+enabled = true
+
+# 路由名称，只用于日志显示。
+name = "示例私聊路由"
+
+# 会话类型：private 表示QQ私聊。
+target_type = "private"
+
+# 对方QQ号。
+target_id = "987654321"
+
+# Planner 使用的模型名称列表，直接写 model_config 中已有模型名。
+planner_models = ["模型C"]
+
+# Replyer 使用的模型名称列表，直接写 model_config 中已有模型名。
+replyer_models = ["模型D", "模型E"]
