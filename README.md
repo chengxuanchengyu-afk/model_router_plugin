@@ -45,6 +45,8 @@ planner_models = ["模型C"]
 replyer_models = ["模型D", "模型E"]
 ```
 
+##已知问题：planner在填写模型后，有无法进行正确路由的问题，正在检查问题
+
 ## 字段说明
 
 ### `enabled`
